@@ -1,21 +1,5 @@
 <template>
 
-  <div id="app">
-    <header class="top-header">
-      <div class="header-text">WHOLESALE GOODS FROM SEOUL</div>
-    </header>
-  </div>
-
-  <nav class="navbar">
-    <div class="nav-container">
-       <!-- 🌟 關鍵修改：使用 router-link 包裹 Logo，點擊後回到首頁 (/) 🌟 -->
-        <router-link to="/" class="logo-link">
-          <div class="logo">K•<span>CORE</span></div>
-        </router-link>
-      <!-- 這裡應有導航連結，但目前只有 logo 和 auth-page 內容 -->
-    </div>
-  </nav>    
-
   <div class="cart-page">
     <h1 class="page-heading">我的購物車</h1>
 
@@ -177,7 +161,9 @@ export default {
   max-width: 1200px;
   margin:  auto;
   padding: 0px 0px;
-  background-color: #fafafa;
+  min-height: calc(100vh - 100px); 
+  background-color: #fafafa; // 保持與您 App.vue 相同的淺灰色背景
+  padding-top: -20px;
 }
 
 .page-heading {
@@ -403,4 +389,5 @@ export default {
     background-color: darken(#d9534f, 8%);
   }
 }
+
 </style>

@@ -1,15 +1,16 @@
 // src/router/index.js
 
 import { createRouter, createWebHistory } from 'vue-router';
-import App from '../App.vue'; // 您的首頁內容 (原 App.vue)
+import Home from '../views/Home.vue'; // 您的首頁內容 (原 App.vue)
 import Login from '../views/Login.vue'; // 登入頁面
 import Cart from '@/views/Cart.vue'; // 進入購物車頁面
+import ProductDetail from '@/views/ProductDetail.vue'; // 匯入商品詳情頁
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: App // 您的 App.vue 現在是首頁
+    component: Home // 您的 Home.vue 現在是首頁
   },
   {
     path: '/login',
@@ -29,6 +30,12 @@ const routes = [
     name: 'Cart',
     component: Cart, // 確保這裡指向您的 Cart.vue
   },
+
+  {
+    path: '/product/pt1', // 定義商品頁面的路徑
+    name: 'ProductDetail',
+    component: ProductDetail
+  }
 
 ];
 

@@ -127,19 +127,19 @@ export default {
 
 <style scoped lang="scss">
 // 使用與 App.vue 相同的內容最大寬度
-$content-width: 1300px; 
+$content-width: 1200px; 
 $primary-color: #655345;
 $accent-color: #b70000;
 
 .product-detail-page {
-  padding: 60px 30px;
+  padding: 0px 30px;
   max-width: $content-width;
   margin: 0 auto;
 }
 
 .detail-container {
   display: flex;
-  gap: 40px; // 圖片和資訊之間的間距
+  gap: 60px; // 圖片和資訊之間的間距
   
   // 響應式佈局：當螢幕小於 1024px 時，改為垂直堆疊
   @media (max-width: 1024px) {
@@ -153,7 +153,7 @@ $accent-color: #b70000;
 // =======================================================
 .product-image-area {
   flex: 1 1 55%; // 圖片區佔 55%
-  max-width: 55%;
+  max-width: 53%;
 
   @media (max-width: 1024px) {
     max-width: 100%; // 在小螢幕上佔滿寬度
@@ -191,7 +191,7 @@ $accent-color: #b70000;
 }
 
 .product-divider {
-  height: 1px;
+  height: 2px;
   background-color: #ddd;
   margin: -10px 0;
 }
@@ -203,22 +203,22 @@ $accent-color: #b70000;
 }
 
 .selection-label {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
   color: $primary-color;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 // 尺寸按鈕
 .size-options {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
 }
 
 .size-btn {
   padding: 10px 15px;
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
   border-radius: 4px;
   background-color: #fff;
   color: #333;
@@ -301,7 +301,7 @@ $accent-color: #b70000;
   color: $accent-color;
   
   .price-label {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 500;
     color: #666;
     margin-right: 10px;

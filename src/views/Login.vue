@@ -1,19 +1,4 @@
 <template>
-  <div id="app">
-    <header class="top-header">
-      <div class="header-text">WHOLESALE GOODS FROM SEOUL</div>
-    </header>
-  </div>
-
-  <nav class="navbar">
-    <div class="nav-container">
-       <!-- 🌟 關鍵修改：使用 router-link 包裹 Logo，點擊後回到首頁 (/) 🌟 -->
-        <router-link to="/" class="logo-link">
-          <div class="logo">K•<span>CORE</span></div>
-        </router-link>
-      <!-- 這裡應有導航連結，但目前只有 logo 和 auth-page 內容 -->
-    </div>
-  </nav>    
 
   <div class="auth-page">
     <div class="auth-box">
@@ -257,51 +242,4 @@ input[type="email"] { // 🌟 新增：確保電子郵件欄位樣式一致
   }
 }
 
-// =======================================================
-// 6. 頂部黑條樣式 (保留使用者提供的)
-// =======================================================
-.top-header {
-  background-color: #a29680;
-  color: #fff;
-  text-align: center;
-  padding: 18px 0;  
-  font-size: 18px;
-  font-weight: 500;  
-  letter-spacing: 2px;
-}
-
-// =======================================================
-// 7. 導航欄樣式 (保留使用者提供的)
-// =======================================================
-.navbar {
-  background-color: #fafafa;
-  padding: 30px 0;  
-}
-
-.nav-container {
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;  
-  align-items: center;
-  padding: 0 30px;
-}
-
-.logo-link {
-  // 🌟 關鍵修正：將文字裝飾設為 none，移除底線
-  text-decoration: none; 
-  cursor: pointer; 
-}
-
-.logo {
-  font-size: 45px;
-  font-weight: 700; 
-  // 確保 logo 文本沒有底線 (雙重保險)
-  text-decoration: none; 
-  color: #000;
-  letter-spacing: 1px;
-
-  span {
-    color: #655345;  
-  }
-}
 </style>
