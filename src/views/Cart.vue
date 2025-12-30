@@ -1,5 +1,4 @@
 <template>
-
   <div class="cart-page">
     <h1 class="page-heading">我的購物車</h1>
 
@@ -20,14 +19,14 @@
           
           <div class="item-details">
             <h3 class="item-name">{{ item.name }}</h3>
-            <p class="item-sku">SKU: {{ item.sku }}</p>
+            <p class="item-size">尺寸: {{ item.size }}</p>
             <p class="item-price">單價: NT$ {{ item.price.toLocaleString() }}</p>
 
             <!-- 數量調整器 -->
             <div class="quantity-control">
-              <button @click="updateQuantity(item.id, -1)" :disabled="item.quantity <= 1">-</button>
+              <button @click="updateQuantity(item, -1)" :disabled="item.quantity <= 1">-</button>
               <input type="number" v-model.number="item.quantity" @change="checkQuantity(item)" min="1">
-              <button @click="updateQuantity(item.id, 1)">+</button>
+              <button @click="updateQuantity(item, 1)">+</button>
             </div>
           </div>
           
@@ -35,7 +34,7 @@
             <!-- 總金額 -->
             <p class="item-subtotal">NT $ {{ (item.price * item.quantity).toLocaleString() }}</p>
             <!-- 移除按鈕 -->
-            <button @click="removeItem(item.id)" class="remove-btn">
+            <button @click="removeItem(item)" class="remove-btn">
               <i class="fas fa-trash-alt"></i> 移除
             </button>
           </div>
@@ -72,38 +71,14 @@
 </template>
 
 <script>
+import { getCart, updateCartItemQuantity, removeFromCart } from '@/utils/cart';
+
 export default {
   name: 'Cart',
   data() {
     return {
-      // 模擬購物車數據
       shippingFee: 60, // 假設固定運費
-      cartItems: [
-        {
-          id: 1,
-          name: '首爾夏季新款 T-Shirt #1',
-          sku: 'ST1001-WH-M',
-          price: 700,
-          quantity: 1,
-          image: 'https://placehold.co/120x160/fafafa/333?text=T-Shirt'
-        },
-        {
-          id: 2,
-          name: '韓系高腰牛仔褲 (深藍)',
-          sku: 'JP2005-DB-L',
-          price: 1200,
-          quantity: 1,
-          image: 'https://placehold.co/120x160/fafafa/333?text=Jeans'
-        },
-        {
-          id: 3,
-          name: '時尚皮革斜背包 (黑)',
-          sku: 'BG3008-BK',
-          price: 1500,
-          quantity: 1,
-          image: 'https://placehold.co/120x160/fafafa/333?text=Bag'
-        }
-      ]
+      cartItems: []
     };
   },
   computed: {
@@ -122,14 +97,16 @@ export default {
     }
   },
   methods: {
+    // 載入購物車資料
+    loadCart() {
+      this.cartItems = getCart();
+    },
     // 調整商品數量
-    updateQuantity(itemId, change) {
-      const item = this.cartItems.find(i => i.id === itemId);
-      if (item) {
-        const newQuantity = item.quantity + change;
-        if (newQuantity >= 1) {
-          item.quantity = newQuantity;
-        }
+     updateQuantity(item, change) {
+      const newQuantity = item.quantity + change;
+      if (newQuantity >= 1) {
+        item.quantity = newQuantity;
+        updateCartItemQuantity(item.id, item.size, newQuantity);
       }
     },
     // 檢查輸入框的數量，確保至少為 1
@@ -137,17 +114,23 @@ export default {
       if (item.quantity < 1 || !item.quantity) {
         item.quantity = 1;
       }
+      updateCartItemQuantity(item.id, item.size, item.quantity);
     },
     // 從購物車中移除商品
-    removeItem(itemId) {
-      this.cartItems = this.cartItems.filter(i => i.id !== itemId);
+    removeItem(item) {
+      removeFromCart(item.id, item.size);
+      this.loadCart(); // 重新載入購物車
     },
     // 處理結帳邏輯 (已將 alert() 替換為 console.log)
     handleCheckout() {
       console.log(`[Checkout Event] 總金額 NT$ ${this.grandTotal.toLocaleString()}。結帳功能待實作！`);
       // 實際應用中會導向結帳頁面
-      // this.$router.push('/checkout');
+       this.$router.push('/checkout');
     }
+  },
+  mounted() {
+    // 組件載入時讀取購物車資料
+    this.loadCart();
   }
 }
 </script>
@@ -158,11 +141,11 @@ export default {
 
 // 主容器
 .cart-page {
-  max-width: 1200px;
+  max-width: 1300px;
   margin:  auto;
-  padding: 0px 0px;
+  padding: 20px 0px;
   min-height: calc(100vh - 100px); 
-  background-color: #fafafa; // 保持與您 App.vue 相同的淺灰色背景
+  background-color: #f6f6f6; // 保持與您 App.vue 相同的淺灰色背景
   padding-top: -20px;
 }
 
@@ -191,13 +174,13 @@ export default {
 
 .empty-cart-message {
   text-align: center;
-  padding: 80px 20px;
+  padding: 80px 300px;
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 1px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   
   p {
-    font-size: 18px;
+    font-size: 24px;
     color: #686869;
     margin-bottom: 20px;
   }
@@ -205,9 +188,10 @@ export default {
 
 .go-shopping-btn {
   display: inline-block;
-  background-color: #a29680;
+  background-color: #655345;
   color: #fff;
-  padding: 12px 30px;
+  font-size: 18px;
+  padding: 16px 30px;
   border-radius: 4px;
   text-decoration: none;
   font-weight: bold;
@@ -226,13 +210,12 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   align-items: center;
-  gap: 20px;
-  
+  gap: 80px; 
 }
 
 .item-image {
-  width: 120px;
-  height: 160px;
+  width: 150px;
+  height: 180px;
   object-fit: cover;
   border-radius: 4px;
 }
@@ -328,9 +311,9 @@ export default {
 // =======================================================
 .order-summary {
   flex: 1; // 佔 30% 寬度
-  width: 120%;
+  width: 100%;
   background-color: #fff;
-  padding: 25px;
+  padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: sticky; // 讓總結區塊在滾動時固定
@@ -348,7 +331,7 @@ export default {
 .summary-line {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-size: 20px;
   
   .value {
@@ -380,7 +363,7 @@ export default {
   color: #fff;
   border: none;
   border-radius: 4px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s;

@@ -67,12 +67,19 @@
               <option value="台北市">台北市</option>
               <option value="新北市">新北市</option>
               <option value="桃園市">桃園市</option>
+              <option value="新竹市">新竹市</option>
               <option value="台中市">台中市</option>
               <option value="台南市">台南市</option>
               <option value="高雄市">高雄市</option>
               <option value="基隆市">基隆市</option>
-              <option value="新竹市">新竹市</option>
-              <option value="嘉義市">嘉義市</option>
+              <option value="苗栗縣">苗栗縣</option>
+              <option value="彰化縣">彰化縣</option>
+              <option value="雲林縣">雲林縣</option>
+              <option value="嘉義縣">嘉義縣</option>
+              <option value="屏東縣">屏東縣</option>
+              <option value="宜蘭縣">宜蘭縣</option>
+              <option value="花蓮縣">花蓮縣</option>
+              <option value="台東縣">台東縣</option>
             </select>
             <span v-if="errors.city" class="error-message">{{ errors.city }}</span>
           </div>
@@ -118,28 +125,7 @@
         <!-- 付款方式 -->
         <section class="form-section">
           <h2 class="section-title">付款方式</h2>
-          
           <div class="payment-options">
-            <label class="payment-option">
-              <input 
-                type="radio" 
-                name="payment" 
-                value="credit_card" 
-                v-model="formData.paymentMethod"
-              >
-              <span class="payment-label">信用卡付款</span>
-            </label>
-
-            <label class="payment-option">
-              <input 
-                type="radio" 
-                name="payment" 
-                value="atm" 
-                v-model="formData.paymentMethod"
-              >
-              <span class="payment-label">ATM 轉帳</span>
-            </label>
-
             <label class="payment-option">
               <input 
                 type="radio" 
@@ -167,19 +153,6 @@
               >
               <span class="shipping-label">
                 <span class="shipping-name">宅配到府</span>
-                <span class="shipping-fee">NT$ 60</span>
-              </span>
-            </label>
-
-            <label class="shipping-option">
-              <input 
-                type="radio" 
-                name="shipping" 
-                value="convenience_store" 
-                v-model="formData.shippingMethod"
-              >
-              <span class="shipping-label">
-                <span class="shipping-name">超商取貨</span>
                 <span class="shipping-fee">NT$ 60</span>
               </span>
             </label>
@@ -229,10 +202,6 @@
           確認送出訂單
         </button>
 
-        <!-- 返回購物車 -->
-        <router-link to="/cart" class="back-to-cart-link">
-          返回購物車
-        </router-link>
       </div>
 
     </div>
@@ -240,7 +209,9 @@
 </template>
 
 <script>
-import { getCart } from '@/utils/cart';
+import { getCart, clearCart } from '@/utils/cart'; // ✅ 確保有引入 clearCart
+import { isLoggedIn, getCurrentUser } from '@/utils/auth'; 
+import { createOrder } from '@/utils/order'; 
 
 export default {
   name: 'Checkout',
@@ -274,8 +245,14 @@ export default {
   },
   methods: {
     loadCart() {
+      // ✅ 檢查是否登入
+      if (!isLoggedIn()) {
+        alert('請先登入才能結帳');
+        this.$router.push('/login');
+        return;
+      }
+      
       this.cartItems = getCart();
-      // 如果購物車是空的,導向購物車頁面
       if (this.cartItems.length === 0) {
         this.$router.push('/cart');
       }
@@ -344,19 +321,22 @@ export default {
         shipping: {
           method: this.formData.shippingMethod,
           fee: this.shippingFee
-        },
-        orderDate: new Date().toISOString()
+        }
       };
 
-      // 這裡應該發送訂單到後端 API
-      console.log('訂單資料:', orderData);
+      // 創建訂單
+      const newOrder = createOrder(orderData);
+      
+      console.log('訂單已創建:', newOrder);
       
       // 顯示成功訊息
-      alert(`訂單送出成功!\n訂單金額: NT$ ${this.grandTotal.toLocaleString()}\n\n我們會盡快為您處理訂單。`);
+      alert(`訂單送出成功!\n訂單編號: ${newOrder.orderNumber}\n訂單金額: NT$ ${this.grandTotal.toLocaleString()}\n\n我們會盡快為您處理訂單。`);
       
-      // 清空購物車並導向首頁
-      localStorage.removeItem('shoppingCart');
-      this.$router.push('/');
+      // 清空購物車
+      clearCart();
+      
+      // 導向訂單頁面
+      this.$router.push('/orders');
     }
   },
   mounted() {
@@ -366,30 +346,31 @@ export default {
 </script>
 
 <style scoped lang="scss">
-$content-width: 1600px; // ✅ 從 1200px 增加到 1400px
+$content-width: 1600px;
 $primary-color: #655345;
 $accent-color: #b70000;
 
 .checkout-page {
   max-width: $content-width;
   margin: 0 auto;
-  padding: 30px 30px;
+  padding: 20px 30px;
   min-height: calc(100vh - 100px);
-  background-color: #fafafa;
+  background-color: #f6f6f6;
 }
 
 .page-heading {
-  font-size: 36px; // ✅ 從 32px 增加到 42px
+  font-size: 32px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 50px; // ✅ 增加間距
+  margin-bottom: 30px;
   color: #333;
 }
 
 .checkout-container {
   display: flex;
-  gap: 80px; // ✅ 從 40px 增加到 50px
+  gap: 30px;
   align-items: flex-start;
+  justify-content: center; 
   
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -400,19 +381,21 @@ $accent-color: #b70000;
 // 左側: 訂單資訊表單
 // ================================================
 .checkout-form {
-  flex: 9; // ✅ 從 2 增加到 2.2,使左側更寬
+  width: 700px; 
+  flex-shrink: 0; // ✅ 防止被壓縮
   background-color: #fff;
-  padding: 40px; // ✅ 從 30px 增加到 40px
+  padding: 25px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  top: 10px;
   
   @media (max-width: 1024px) {
-    width: 150%;
+    width: 100%;
   }
 }
 
 .form-section {
-  margin-bottom: 45px; // ✅ 從 35px 增加到 45px
+  margin-bottom: 45px;
   
   &:last-child {
     margin-bottom: 0;
@@ -420,39 +403,39 @@ $accent-color: #b70000;
 }
 
 .section-title {
-  font-size: 28px; // ✅ 從 22px 增加到 28px
+  font-size: 28px;
   font-weight: bold;
   color: $primary-color;
-  margin-bottom: 25px; // ✅ 從 20px 增加
+  margin-bottom: 25px;
   padding-bottom: 12px;
   border-bottom: 2px solid #eee;
 }
 
 .form-group {
-  margin-bottom: 25px; // ✅ 從 20px 增加到 25px
+  margin-bottom: 25px;
 }
 
 .form-label {
   display: block;
-  font-size: 19px; // ✅ 從 16px 增加到 19px
+  font-size: 19px;
   font-weight: 500;
   color: #333;
-  margin-bottom: 10px; // ✅ 從 8px 增加
+  margin-bottom: 10px;
 }
 
 .required {
   color: $accent-color;
-  font-size: 19px; // ✅ 明確設定大小
+  font-size: 19px;
 }
 
 .form-input,
 .form-select,
 .form-textarea {
   width: 100%;
-  padding: 16px 18px; // ✅ 從 12px 15px 增加到 16px 18px
-  font-size: 18px; // ✅ 從 16px 增加到 18px
-  border: 2px solid #ddd; // ✅ 從 1px 增加到 2px
-  border-radius: 6px; // ✅ 從 4px 增加
+  padding: 16px 18px;
+  font-size: 18px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
   transition: border-color 0.3s;
   
   &:focus {
@@ -468,15 +451,15 @@ $accent-color: #b70000;
 .form-textarea {
   resize: vertical;
   font-family: inherit;
-  line-height: 1.6; // ✅ 增加行高
+  line-height: 1.6;
 }
 
 .error-message {
   display: block;
   color: $accent-color;
-  font-size: 16px; // ✅ 從 14px 增加到 16px
+  font-size: 16px;
   margin-top: 6px;
-  font-weight: 500; // ✅ 增加字重
+  font-weight: 500;
 }
 
 // 付款方式
@@ -484,16 +467,16 @@ $accent-color: #b70000;
 .shipping-options {
   display: flex;
   flex-direction: column;
-  gap: 18px; // ✅ 從 15px 增加到 18px
+  gap: 18px;
 }
 
 .payment-option,
 .shipping-option {
   display: flex;
   align-items: center;
-  padding: 20px; // ✅ 從 15px 增加到 20px
+  padding: 20px;
   border: 2px solid #ddd;
-  border-radius: 6px; // ✅ 從 4px 增加
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s;
   
@@ -503,9 +486,9 @@ $accent-color: #b70000;
   }
   
   input[type="radio"] {
-    margin-right: 15px; // ✅ 從 12px 增加到 15px
-    width: 22px; // ✅ 從 18px 增加到 22px
-    height: 22px; // ✅ 從 18px 增加到 22px
+    margin-right: 15px;
+    width: 22px;
+    height: 22px;
     cursor: pointer;
   }
   
@@ -517,7 +500,7 @@ $accent-color: #b70000;
 }
 
 .payment-label {
-  font-size: 19px; // ✅ 從 16px 增加到 19px
+  font-size: 19px;
   color: #333;
 }
 
@@ -525,7 +508,7 @@ $accent-color: #b70000;
   display: flex;
   justify-content: space-between;
   width: 100%;
-  font-size: 19px; // ✅ 從 16px 增加到 19px
+  font-size: 19px;
   color: #333;
 }
 
@@ -535,44 +518,45 @@ $accent-color: #b70000;
 
 .shipping-fee {
   color: #666;
-  font-weight: 600; // ✅ 增加字重
+  font-weight: 600;
 }
 
 // ================================================
 // 右側: 訂單摘要
 // ================================================
 .order-summary {
-  flex: 7; // ✅ 從 1 增加到 1.3,使右側更寬
+  width: 450px; 
+  flex-shrink: 0; // ✅ 防止被壓縮
   background-color: #fff;
-  padding: 40px; // ✅ 從 30px 增加到 40px
+  padding: 25px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: sticky;
-  top: 20px;
+  top: 0px;
   
   @media (max-width: 1024px) {
-    width: 150%;
+    width: 100%;
     position: static;
   }
 }
 
 .summary-title {
-  font-size: 28px; // ✅ 從 24px 增加到 28px
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 30px; // ✅ 從 25px 增加
+  margin-bottom: 30px;
   color: #333;
 }
 
 .summary-items {
-  margin-bottom: 25px; // ✅ 從 20px 增加
+  margin-bottom: 25px;
 }
 
 .summary-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px; // ✅ 從 15px 增加
-  padding-bottom: 20px; // ✅ 從 15px 增加
+  margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid #e8e8e8;
   
   &:last-child {
@@ -588,91 +572,77 @@ $accent-color: #b70000;
 }
 
 .item-name {
-  font-size: 18px; // ✅ 從 14px 增加到 18px
-  font-weight: 600; // ✅ 從 500 增加到 600
+  font-size: 18px;
+  font-weight: 600;
   color: #333;
-  margin-bottom: 8px; // ✅ 從 5px 增加
+  margin-bottom: 8px;
   line-height: 1.4;
 }
 
 .item-specs {
-  font-size: 16px; // ✅ 從 13px 增加到 16px
+  font-size: 16px;
   color: #888;
 }
 
 .item-price {
-  font-size: 19px; // ✅ 從 16px 增加到 19px
-  font-weight: 700; // ✅ 從 bold 改為 700
+  font-size: 19px;
+  font-weight: 700;
   color: #333;
   white-space: nowrap;
 }
 
 .summary-divider {
-  border-top: 1px solid #d0d0d0; // ✅ 加深顏色
-  margin: 25px 0; // ✅ 從 20px 增加
+  border-top: 1px solid #d0d0d0;
+  margin: 25px 0;
 }
 
 .summary-line {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 18px; // ✅ 從 15px 增加
-  font-size: 19px; // ✅ 從 16px 增加到 19px
-  color: #555; // ✅ 從 #666 調整
+  margin-bottom: 18px;
+  font-size: 19px;
+  color: #555;
   
   .value {
-    font-weight: 600; // ✅ 從 500 增加到 600
+    font-weight: 600;
     color: #333;
   }
 }
 
 .total-line {
-  font-size: 26px; // ✅ 從 20px 增加到 26px
+  font-size: 26px;
   font-weight: bold;
   color: #000;
-  margin-top: 12px; // ✅ 增加上方間距
+  margin-top: 12px;
   padding-top: 5px;
   
   .total-value {
     color: $accent-color;
-    font-size: 28px; // ✅ 讓總金額更突出
+    font-size: 28px;
   }
 }
 
 .submit-order-btn {
   width: 100%;
-  padding: 20px; // ✅ 從 16px 增加到 20px
-  margin-top: 30px; // ✅ 從 25px 增加
+  padding: 20px;
+  margin-top: 10px;
   background-color: $primary-color;
   color: #fff;
   border: none;
-  border-radius: 6px; // ✅ 從 4px 增加
-  font-size: 21px; // ✅ 從 18px 增加到 21px
+  border-radius: 6px;
+  font-size: 21px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
   
   &:hover {
     background-color: darken($primary-color, 8%);
-    transform: translateY(-1px); // ✅ 增加懸停效果
+    transform: translateY(-1px);
   }
   
   &:active {
-    transform: translateY(0); // ✅ 增加點擊效果
+    transform: translateY(0);
   }
 }
 
-.back-to-cart-link {
-  display: block;
-  text-align: center;
-  margin-top: 18px; // ✅ 從 15px 增加
-  color: #666;
-  text-decoration: none;
-  font-size: 17px; // ✅ 從 15px 增加到 17px
-  transition: color 0.3s;
-  
-  &:hover {
-    color: $primary-color;
-    text-decoration: underline; // ✅ 增加懸停效果
-  }
-}
 </style>

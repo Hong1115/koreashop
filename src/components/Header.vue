@@ -12,25 +12,70 @@
         <!-- 這裡應有導航連結，但目前只有 logo 和 auth-page 內容 -->
 
         <div class="nav-links">
-          <a href="#" class="nav-item">新品上架</a>
-          <a href="#" class="nav-item">衛衣</a>
-          <a href="#" class="nav-item">T恤</a>
-          <a href="#" class="nav-item">帽子</a>
-          <a href="#" class="nav-item">其他配件</a>
+           <!-- ✅ 將「全部商品」改為 router-link -->
+          <router-link to="/products/all" class="nav-item">全部商品</router-link>
+          <!-- ✅ 將「衛衣」改為 router-link -->
+          <router-link to="/category/hoodie" class="nav-item">長袖</router-link>
+          <!-- ✅ 將「T恤」改為 router-link -->
+          <router-link to="/category/tshirt" class="nav-item">T恤</router-link>
+          <!-- ✅ 將「帽子」改為 router-link -->
+          <router-link to="/category/hat" class="nav-item">帽子</router-link>
+          <!-- ✅ 將「其他配件」改為 router-link -->
+          <router-link to="/category/other" class="nav-item">其他配件</router-link>
         </div>
 
         <div class="auth-cart-links">
-          <router-link to="/login" class="auth-link">登入</router-link>
+          <!-- 根據登入狀態顯示不同內容 -->
+          <template v-if="currentUser">
+            <!-- ✅ 修改:讓會員名稱可以點擊,導向訂單頁面 -->
+            <router-link to="/orders" class="user-welcome">Hi, {{ currentUser.name }}</router-link>
+            <button @click="handleLogout" class="logout-link">登出</button>
+          </template>
+          <template v-else>
+            <router-link to="/login" class="auth-link">登入</router-link>
+          </template>
           <router-link to="/cart" class="auth-link">購物車</router-link>
         </div>
 
       </div>
+
+      <!-- ✅ 新增:分界線 -->
+      <div class="navbar-divider"></div>
+
     </nav>
 </template>
 
 <script>
+import { getCurrentUser, logoutUser } from '@/utils/auth';
+
 export default {
-  name: 'Header'
+  name: 'Header',
+  data() {
+    return {
+      currentUser: null
+    };
+  },
+  methods: {
+    loadUser() {
+      this.currentUser = getCurrentUser();
+    },
+    handleLogout() {
+      if (confirm('確定要登出嗎?')) {
+        logoutUser();
+        this.currentUser = null;
+        alert('已登出');
+        this.$router.push('/');
+      }
+    }
+  },
+  mounted() {
+    this.loadUser();
+  },
+  watch: {
+    '$route'() {
+      this.loadUser();
+    }
+  }
 }
 </script>
 
@@ -39,7 +84,7 @@ export default {
 $content-width: 1300px;
 
 .top-header {
-  background-color: #a29680;
+  background-color: #b2a79b;
   color: #fff;
   text-align: center;
   padding: 18px 0;
@@ -50,7 +95,8 @@ $content-width: 1300px;
 
 .navbar {
   background-color: #fafafa;
-  padding: 30px 0;
+  padding: 30px 0 0 0; // ✅ 修改:移除底部 padding,讓分界線緊貼導航欄
+  position: relative; // ✅ 新增:讓分界線定位正確
 }
 
 .nav-container {
@@ -59,7 +105,7 @@ $content-width: 1300px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 30px;
+  padding: 0 30px 30px 30px; // ✅ 修改:把 padding 移到這裡
 }
 
 .logo-link {
@@ -89,8 +135,38 @@ $content-width: 1300px;
   margin-left: auto;
 }
 
+// ✅ 修改:讓會員名稱樣式跟購物車一致
+.user-welcome {
+  font-size: 20px;
+  font-weight: bold;
+  color: #655345; // 跟 auth-link 相同顏色
+  white-space: nowrap;
+  text-decoration: none; // ✅ 移除底線
+
+  &:hover {
+    opacity: 0.7; // ✅ 懸停效果
+  }
+}
+
+// ✅ 修改:讓登出連結樣式跟購物車一致
+.logout-link {
+  font-size: 20px;
+  font-weight: bold;
+  color: #655345; // 跟 auth-link 相同顏色
+  background: none; // 移除按鈕背景
+  border: none; // 移除按鈕邊框
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0; // 移除按鈕內距
+  
+  &:hover {
+    opacity: 0.7; // 懸停效果
+  }
+}
+
 .auth-link {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   color: #655345;
   text-decoration: none;
@@ -98,10 +174,19 @@ $content-width: 1300px;
 }
 
 .nav-item {
-  color: #686869;
+  color: #39393aff;
   text-decoration: none;
   padding: 0 30px;
-  font-size: 20px;
+  font-size: 22px;
   transition: color 0.3s;
 }
+
+// ✅ 新增:分界線樣式
+.navbar-divider {
+  width: 100%;
+  height: 3px;
+  background-color: #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // 陰影效果
+}
+
 </style>

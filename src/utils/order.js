@@ -48,13 +48,13 @@ export function createOrder(orderData) {
   return newOrder;
 }
 
-// 根據訂單 ID 獲取訂單
+// 根據訂單
 export function getOrderById(orderId) {
   const orders = getOrders();
   return orders.find(order => order.id === orderId);
 }
 
-// 獲取訂單狀態的中文名稱
+// 獲取訂單狀態
 export function getOrderStatusText(status) {
   const statusMap = {
     'pending': '待處理',
@@ -65,7 +65,7 @@ export function getOrderStatusText(status) {
   return statusMap[status] || '未知狀態';
 }
 
-// 獲取付款方式的中文名稱
+// 獲取付款方式
 export function getPaymentMethodText(method) {
   const methodMap = {
     'credit_card': '信用卡付款',
@@ -75,7 +75,7 @@ export function getPaymentMethodText(method) {
   return methodMap[method] || '未知付款方式';
 }
 
-// 獲取配送方式的中文名稱
+// 獲取配送方式
 export function getShippingMethodText(method) {
   const methodMap = {
     'home_delivery': '宅配到府',

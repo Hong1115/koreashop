@@ -144,7 +144,7 @@ $content-width: 1300px;
 .product-color {
   font-size: 18px;
   font-weight: normal;
-  color: #686869;
+  color: #39393aff;
   line-height: 1.5;
 }
 

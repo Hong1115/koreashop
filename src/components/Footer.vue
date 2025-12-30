@@ -35,7 +35,7 @@ export default {
 $content-width: 1300px;
 
 .main-footer {
-  background-color: #fafafa;
+  background-color: #f6f6f6;
   padding-top: 50px;
   padding-bottom: 30px;
 }

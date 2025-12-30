@@ -1,14 +1,24 @@
 // src/utils/cart.js
+import { isLoggedIn, getCurrentUser } from './auth';
+
+// 獲取購物車 key
+function getCartKey() {
+  if (isLoggedIn()) {
+    const user = getCurrentUser();
+    return `shoppingCart_${user.id}`;
+  }
+  return 'shoppingCart_guest';
+}
 
 // 獲取購物車資料
 export function getCart() {
-  const cartData = localStorage.getItem('shoppingCart');
+  const cartData = localStorage.getItem('getCartKey');
   return cartData ? JSON.parse(cartData) : [];
 }
 
 // 儲存購物車資料
 export function saveCart(cartItems) {
-  localStorage.setItem('shoppingCart', JSON.stringify(cartItems));
+  localStorage.setItem('getCartKey', JSON.stringify(cartItems));
 }
 
 // 加入商品到購物車
@@ -51,5 +61,5 @@ export function removeFromCart(itemId, size) {
 
 // 清空購物車
 export function clearCart() {
-  localStorage.removeItem('shoppingCart');
+  localStorage.removeItem('getCartKey');
 }

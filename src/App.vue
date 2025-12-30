@@ -12,7 +12,7 @@
 </template>
 
 <script>
-// 匯入剛才創建的組件
+// 匯入Header、Footer
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 
@@ -27,7 +27,7 @@ export default {
 
 <style lang="scss">
 
-// 這裡是放全域樣式的地方
+// 放全域樣式的地方
 * {
   box-sizing: border-box;
   margin: 0;
@@ -38,7 +38,7 @@ export default {
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fafafa; /* 全網頁背景色 */
+  background-color: #f6f6f6; 
   min-height: 100vh;
   display: flex;
   flex-direction: column;

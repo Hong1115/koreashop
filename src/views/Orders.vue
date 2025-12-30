@@ -131,15 +131,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
-$content-width: 1600px; // ✅ 增加寬度
+$content-width: 1600px; 
 $accent-color: #b70000;
 
 .orders-page {
-  max-width: $content-width; // ✅ 使用更寬的容器
+  max-width: $content-width;
   margin: 0 auto;
   padding: 20px 0px;
   min-height: calc(100vh - 100px); 
-  background-color: #f6f6f6; // 保持與您 App.vue 相同的淺灰色背景
+  background-color: #f6f6f6; 
   padding-top: -20px;
 }
 
@@ -153,14 +153,17 @@ $accent-color: #b70000;
 
 // 空訂單狀態
 .empty-orders {
+  width: 120%; 
+  max-width: 1200px; 
   text-align: center;
-  padding: 100px 20px;
+  width: 1060px;
+  padding: 80px 20px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   
   p {
-    font-size: 20px;
+    font-size: 24px;
     color: #666;
     margin-bottom: 30px;
   }
@@ -186,15 +189,15 @@ $accent-color: #b70000;
 .orders-container {
   display: flex;
   flex-direction: column;
-  gap: 30px; // ✅ 增加訂單之間的間距
+  gap: 30px; 
 }
 
 .order-card {
   background-color: #fff;
   border-radius: 8px;
-  padding: 35px; // ✅ 增加內距
+  padding: 35px; 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  width: 100%; // ✅ 移除寬度限制
+  width: 100%; 
 }
 
 // 訂單標題
@@ -202,25 +205,25 @@ $accent-color: #b70000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 25px; // ✅ 增加底部間距
+  padding-bottom: 25px; 
   border-bottom: 2px solid #f0f0f0;
-  margin-bottom: 30px; // ✅ 增加與內容的間距
+  margin-bottom: 30px; 
 }
 
 .order-info {
   display: flex;
   flex-direction: column;
-  gap: 8px; // ✅ 增加間距
+  gap: 8px; 
 }
 
 .order-number {
-  font-size: 22px; // ✅ 放大字體
+  font-size: 22px; 
   font-weight: bold;
   color: #333;
 }
 
 .order-date {
-  font-size: 17px; // ✅ 放大字體
+  font-size: 17px; 
   color: #888;
 }
 
@@ -238,15 +241,15 @@ $accent-color: #b70000;
 }
 
 .order-total-amount {
-  font-size: 26px; // ✅ 突出顯示總金額
+  font-size: 26px; 
   font-weight: bold;
   color: $accent-color;
 }
 
 .order-status {
-  padding: 10px 25px; // ✅ 增加內距
+  padding: 10px 25px; 
   border-radius: 20px;
-  font-size: 17px; // ✅ 放大字體
+  font-size: 17px; 
   font-weight: bold;
   white-space: nowrap;
   
@@ -274,7 +277,7 @@ $accent-color: #b70000;
 // ✅ 新增:訂單內容區(左右分欄)
 .order-content {
   display: flex;
-  gap: 40px; // ✅ 左右欄位間距
+  gap: 40px; 
   
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -283,21 +286,21 @@ $accent-color: #b70000;
 
 // ✅ 左側:商品列表區
 .order-items-section {
-  flex: 5; // ✅ 佔 2/3 寬度
-  min-width: 0; // ✅ 防止 flex 項目溢出
+  flex: 5; 
+  min-width: 0; 
 }
 
 // ✅ 右側:訂單資訊區
 .order-info-section {
-  flex: 4; // ✅ 佔 1/3 寬度
-  min-width: 350px; // ✅ 最小寬度
+  flex: 4; 
+  min-width: 350px; 
 }
 
 .section-title {
-  font-size: 20px; // ✅ 放大字體
+  font-size: 20px; 
   font-weight: bold;
   color: #655345;
-  margin-bottom: 20px; // ✅ 增加間距
+  margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid #e8e8e8;
 }
@@ -306,63 +309,63 @@ $accent-color: #b70000;
 .order-items {
   display: flex;
   flex-direction: column;
-  gap: 15px; // ✅ 增加商品之間間距
+  gap: 15px; 
 }
 
 .order-item {
   display: flex;
   gap: 20px;
-  padding: 20px; // ✅ 增加內距
+  padding: 20px; 
   background-color: #fafafa;
   border-radius: 6px;
   align-items: center;
 }
 
 .item-image {
-  width: 100px; // ✅ 增加圖片大小
-  height: 100px; // ✅ 增加圖片大小
+  width: 100px; 
+  height: 100px; 
   object-fit: cover;
   border-radius: 4px;
-  flex-shrink: 0; // ✅ 防止圖片被壓縮
+  flex-shrink: 0; 
 }
 
 .item-details {
   flex-grow: 1;
-  min-width: 0; // ✅ 允許文字換行
+  min-width: 0; 
 }
 
 .item-name {
-  font-size: 19px; // ✅ 放大字體
+  font-size: 19px; 
   font-weight: 600;
   color: #333;
-  margin-bottom: 8px; // ✅ 增加間距
+  margin-bottom: 8px; 
 }
 
 .item-specs {
-  font-size: 16px; // ✅ 放大字體
+  font-size: 16px; 
   color: #666;
 }
 
 .item-price {
-  font-size: 20px; // ✅ 放大字體
+  font-size: 20px; 
   font-weight: bold;
   color: #333;
   white-space: nowrap;
-  margin-left: 20px; // ✅ 增加左邊距
+  margin-left: 20px; 
 }
 
 // 訂單摘要
 .order-summary {
   background-color: #f9f9f9;
-  padding: 25px; // ✅ 增加內距
+  padding: 25px; 
   border-radius: 6px;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0; // ✅ 增加上下間距
-  font-size: 17px; // ✅ 放大字體
+  padding: 12px 0; 
+  font-size: 17px; 
   color: #555;
   
   &:not(:last-child) {
@@ -379,6 +382,6 @@ $accent-color: #b70000;
 
 .summary-divider {
   border-top: 2px solid #ddd;
-  margin: 20px 0; // ✅ 增加上下間距
+  margin: 20px 0; 
 }
 </style>

@@ -1,5 +1,4 @@
 <template>
-
   <div class="auth-page">
     <div class="auth-box">
       <h2 class="auth-title">{{ isLogin ? '會員登入' : '會員註冊' }}</h2>
@@ -8,48 +7,92 @@
         <div class="auth-fields">
           
           <div v-if="isLogin">
+            <!-- 登入模式 -->
             <div class="input-group">
-              <label for="login-account">帳號</label>
-              <input type="text" id="login-account" v-model="account" required placeholder="請輸入帳號">
+              <label for="login-account">Email</label>
+              <input 
+                type="text" 
+                id="login-account" 
+                v-model="account" 
+                placeholder="請輸入 Email"
+              >
             </div>
             <div class="input-group">
               <label for="login-password">密碼</label>
-              <input type="password" id="login-password" v-model="password" required placeholder="請輸入密碼">
+              <input 
+                type="password" 
+                id="login-password" 
+                v-model="password" 
+                placeholder="請輸入密碼"
+              >
             </div>
           </div>
           
           <div v-else>
-            <!-- 註冊模式：包含所有欄位 -->
+            <!-- 註冊模式 -->
             <div class="input-group">
-              <label for="register-account">帳號</label>
-              <input type="text" id="register-account" v-model="account" required placeholder="請設定帳號">
+              <label for="register-account">Email <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="register-account" 
+                v-model="account" 
+                placeholder="請輸入 Email"
+                :class="{ 'error': errors.account }"
+              >
+              <span v-if="errors.account" class="error-message">{{ errors.account }}</span>
             </div>
             
             <div class="input-group">
-              <label for="last-name">姓名</label>
-              <input type="text" id="last-name" v-model="lastName" required placeholder="請輸入您的姓名">
-            </div>
-            
-            <!-- 確保 type="tel" 和 type="email" 的欄位大小一致 -->
-            <div class="input-group">
-              <label for="phone">手機</label>
-              <input type="tel" id="phone" v-model="phoneNumber" required placeholder="請輸入手機號碼">
-            </div>
-            <div class="input-group">
-              <label for="email">電子郵件</label>
-              <input type="email" id="email" v-model="email" required placeholder="請輸入電子郵件">
+              <label for="last-name">姓名 <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="last-name" 
+                v-model="lastName" 
+                placeholder="請輸入您的姓名"
+                :class="{ 'error': errors.lastName }"
+              >
+              <span v-if="errors.lastName" class="error-message">{{ errors.lastName }}</span>
             </div>
             
             <div class="input-group">
-              <label for="register-password">密碼</label>
-              <input type="password" id="register-password" v-model="password" required placeholder="請設定密碼">
+              <label for="phone">手機 <span class="required">*</span></label>
+              <input 
+                type="tel" 
+                id="phone" 
+                v-model="phoneNumber" 
+                placeholder="請輸入手機號碼"
+                :class="{ 'error': errors.phoneNumber }"
+              >
+              <span v-if="errors.phoneNumber" class="error-message">{{ errors.phoneNumber }}</span>
             </div>
             
             <div class="input-group">
-              <label for="confirm-password">確認密碼</label>
-              <input type="password" id="confirm-password" v-model="confirmPassword" required placeholder="請再次輸入密碼">
+              <label for="register-password">密碼 <span class="required">*</span></label>
+              <input 
+                type="password" 
+                id="register-password" 
+                v-model="password" 
+                placeholder="8-14字,須含英文及數字"
+                :class="{ 'error': errors.password }"
+              >
+              <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
+              <div class="password-hint">
+              8-14個字元,必須包含英文字母和數字,不可有符號,不可連續三個相同字元
+              </div>
             </div>
+            
+            <div class="input-group">
+              <label for="confirm-password">確認密碼 <span class="required">*</span></label>
+              <input 
+                type="password" 
+                id="confirm-password" 
+                v-model="confirmPassword" 
+                placeholder="請再次輸入密碼"
+                :class="{ 'error': errors.confirmPassword }"
+              >
+              <span v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</span>
             </div>
+          </div>
         </div>
         
         <!-- 登入或註冊按鈕 -->
@@ -71,77 +114,189 @@
 </template>
 
 <script>
+import { registerUser, loginUser } from '@/utils/auth';
+
 export default {
   name: 'Login',
   data() {
     return {
-      account: '',
+      account: '',        // Email (當作帳號)
       password: '',
       confirmPassword: '',
-      lastName: '',     // 姓
-      phoneNumber: '',  // 手機號碼
-      email: ''         // 電子郵件
+      lastName: '',
+      phoneNumber: '',
+      errors: {}
     };
   },
   computed: {
-    // 判斷當前頁面是登入還是註冊
     isLogin() {
       return this.$route.path === '/login';
     }
   },
   methods: {
+    // 驗證 Email 格式
+    validateEmail(email) {
+      if (!email.trim()) {
+        return '請輸入 Email';
+      }
+      if (!email.includes('@')) {
+        return 'Email 必須包含 @';
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return '請輸入正確的 Email 格式';
+      }
+      return null;
+    },
+    
+    // 驗證手機號碼
+    validatePhone(phone) {
+      if (!phone.trim()) {
+        return '請輸入手機號碼';
+      }
+      const cleanPhone = phone.replace(/\s|-/g, '');
+      if (!/^09\d{8}$/.test(cleanPhone)) {
+        return '手機號碼必須是 09 開頭的 10 位數字';
+      }
+      return null;
+    },
+    
+    // 驗證密碼
+    validatePassword(password) {
+      if (!password) {
+        return '請輸入密碼';
+      }
+      
+      if (password.length < 8 || password.length > 14) {
+        return '密碼長度必須在 8-14 個字元之間';
+      }
+      
+      if (!/^[a-zA-Z0-9]+$/.test(password)) {
+        return '密碼只能包含英文字母和數字,不可有符號';
+      }
+      
+      if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+        return '密碼必須同時包含英文字母和數字';
+      }
+      
+      for (let i = 0; i < password.length - 2; i++) {
+        if (password[i] === password[i + 1] && password[i] === password[i + 2]) {
+          return '密碼不可包含連續三個相同的字元';
+        }
+      }
+      
+      return null;
+    },
+    
+    // 驗證註冊表單
+    validateRegisterForm() {
+      this.errors = {};
+      
+      // 驗證 Email
+      const emailError = this.validateEmail(this.account);
+      if (emailError) {
+        this.errors.account = emailError;
+      }
+      
+      // 驗證姓名
+      if (!this.lastName.trim()) {
+        this.errors.lastName = '請輸入姓名';
+      }
+      
+      // 驗證手機
+      const phoneError = this.validatePhone(this.phoneNumber);
+      if (phoneError) {
+        this.errors.phoneNumber = phoneError;
+      }
+      
+      // 驗證密碼
+      const passwordError = this.validatePassword(this.password);
+      if (passwordError) {
+        this.errors.password = passwordError;
+      }
+      
+      // 驗證確認密碼
+      if (!this.confirmPassword) {
+        this.errors.confirmPassword = '請再次輸入密碼';
+      } else if (this.password !== this.confirmPassword) {
+        this.errors.confirmPassword = '兩次密碼輸入不一致';
+      }
+      
+      return Object.keys(this.errors).length === 0;
+    },
+    
     handleSubmit() {
       if (this.isLogin) {
-        console.log('嘗試登入:', this.account, this.password);
-        alert('登入功能待實作！');
-        // this.$router.push('/');
-      } else {
-        if (this.password !== this.confirmPassword) {
-          alert('兩次密碼輸入不一致！');
+        // 登入邏輯
+        if (!this.account || !this.password) {
+          alert('請輸入 Email 和密碼');
           return;
         }
-
-        console.log('嘗試註冊:');
-        console.log('帳號:', this.account);
-        console.log('姓名:', this.lastName);
-        console.log('手機:', this.phoneNumber);
-        console.log('Email:', this.email);
-        console.log('密碼:', this.password);
-
-        alert('註冊功能待實作！');
-        // this.$router.push('/login');
+        
+        const result = loginUser(this.account, this.password);
+        
+        if (result.success) {
+          alert(`歡迎回來, ${result.user.name}!`);
+          this.$router.push('/');
+        } else {
+          alert(result.message);
+        }
+      } else {
+        // 註冊邏輯
+        if (!this.validateRegisterForm()) {
+          alert('請修正表單中的錯誤');
+          return;
+        }
+        
+        const userData = {
+          email: this.account,
+          name: this.lastName,
+          phone: this.phoneNumber.replace(/\s|-/g, ''),
+          password: this.password
+        };
+        
+        const result = registerUser(userData);
+        
+        if (result.success) {
+          alert('註冊成功!請使用您的 Email 登入。');
+          this.$router.push('/login');
+        } else {
+          alert(result.message);
+        }
       }
+    }
+  },
+  watch: {
+    '$route'() {
+      // 切換路由時清空表單和錯誤訊息
+      this.account = '';
+      this.password = '';
+      this.confirmPassword = '';
+      this.lastName = '';
+      this.phoneNumber = '';
+      this.errors = {};
     }
   }
 }
 </script>
 
 <style scoped lang="scss">
-// =======================================================
-// 1. 頁面容器樣式
-// =======================================================
 .auth-page {
-  // 使用 flexbox 將內容垂直和水平居中
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  
-  // 這裡使用您提供的 min-height
   min-height: calc(100vh - 100px); 
-  background-color: #fafafa; // 保持與您 App.vue 相同的淺灰色背景
-  padding-top: -20px;
+  background-color: #f6f6f6;
+  padding-top: 50px;
 }
 
-// =======================================================
-// 2. 登入/註冊卡片樣式
-// =======================================================
 .auth-box {
   width: 100%;
-  max-width: 550px; // 設定最大寬度，避免在寬螢幕上過大
-  background-color: #fff; // 白色卡片背景
+  max-width: 550px;
+  background-color: #fff;
   padding: 40px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // 柔和的陰影
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
@@ -150,14 +305,10 @@ export default {
   font-weight: bold;
   color: #333;
   margin-bottom: 30px;
-  border-bottom: 3px solid #a29680; // 底部與 Header 頂部相呼應的淺棕色線
+  border-bottom: 3px solid #a29680;
   padding-bottom: 15px;
 }
 
-// =======================================================
-// 3. 輸入欄位樣式
-// 修正：將 type="tel" 和 type="email" 加入選擇器，確保樣式一致
-// =======================================================
 .input-group {
   text-align: left;
   margin-bottom: 20px;
@@ -171,10 +322,13 @@ label {
   font-weight: 550;
 }
 
+.required {
+  color: #d9534f;
+}
+
 input[type="text"],
 input[type="password"],
-input[type="tel"], // 🌟 新增：確保手機號碼欄位樣式一致
-input[type="email"] { // 🌟 新增：確保電子郵件欄位樣式一致
+input[type="tel"] {
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
@@ -183,15 +337,31 @@ input[type="email"] { // 🌟 新增：確保電子郵件欄位樣式一致
   transition: border-color 0.3s;
   
   &:focus {
-    border-color: #d9534f; // 聚焦時使用您的主題紅色
+    border-color: #655345;
     outline: none;
-    box-shadow: 0 0 5px rgba(#d9534f, 0.2);
+    box-shadow: 0 0 5px rgba(#655345, 0.2);
+  }
+  
+  &.error {
+    border-color: #d9534f;
   }
 }
 
-// =======================================================
-// 4. 按鈕樣式 (登入/註冊)
-// =======================================================
+.error-message {
+  display: block;
+  color: #d9534f;
+  font-size: 14px;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+.password-hint {
+  font-size: 16px;
+  color: #666;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
 .auth-button {
   width: 100%;
   padding: 15px;
@@ -204,34 +374,23 @@ input[type="email"] { // 🌟 新增：確保電子郵件欄位樣式一致
   margin-top: 10px;
 }
 
-.login-button {
-  background-color: #655345; // 您的主題棕色
-  color: #fff;
-  
-  &:hover {
-    background-color: darken(#655345, 8%); // 修正：確保 hover 時變暗的是主題棕色
-  }
-}
-
+.login-button,
 .register-button {
-  background-color: #655345; // 您的 Header 頂部棕色
+  background-color: #655345;
   color: #fff;
   
   &:hover {
-    background-color: darken(#a29680, 8%);
+    background-color: darken(#655345, 8%);
   }
 }
 
-// =======================================================
-// 5. 登入/註冊切換連結
-// =======================================================
 .switch-link {
   margin-top: 25px;
   font-size: 18px;
   color: #686869;
   
   a {
-    color: #d9534f; // 連結使用您的主題紅色
+    color: #d9534f;
     text-decoration: none;
     font-weight: bold;
     margin-left: 5px;
@@ -241,5 +400,4 @@ input[type="email"] { // 🌟 新增：確保電子郵件欄位樣式一致
     }
   }
 }
-
 </style>
